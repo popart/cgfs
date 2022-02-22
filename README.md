@@ -18,4 +18,5 @@ compile:
 Notice that `/usr/lib/` ends with a slash.
 `-Wall -g` adds debugging info.
 
-
+# Coding style
+based on "Modern C" by Jens Gustedt
