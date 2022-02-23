@@ -1,6 +1,7 @@
 #include <cairo.h>
 
-void put_pixel(cairo_t* cr, int x, int y);
+void put_pixel(cairo_t* cr, int x, int y, float red, float blue, float green);
+void translate_coord(cairo_t* cr, int point[2]);
 
 int main (int argc, char* argv[argc+1]) {
   // create surface & canvas
@@ -10,7 +11,9 @@ int main (int argc, char* argv[argc+1]) {
     cairo_create(surface);
 
   // draw on canvas
-  put_pixel(cr, 120, 40);
+  for(int i = 0; i < 100; ++i) {
+    put_pixel(cr, i, i, (float)i/100.0, 2 * (float)i/100.0, (float)i/100.0);
+  }
 
   // save & cleanup
   cairo_destroy(cr);
@@ -21,11 +24,27 @@ int main (int argc, char* argv[argc+1]) {
 }
 
 /* cairo implementation: draws a 1x1 rectangle */
-void put_pixel(cairo_t* cr, int x, int y) {
+void put_pixel(cairo_t* cr, int x, int y, float red, float blue, float green) {
+  // convert math-coord to canvas-coord
+  int point[2] = { 
+    [0] = x,
+    [1] = y
+  };
+  translate_coord(cr, point);
+
   // create a closed subpath
-  cairo_rectangle(cr, x, y, 1, 1);
+  cairo_rectangle(cr, point[0], point[1], 1, 1);
   // set color to black
-  cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+  cairo_set_source_rgb(cr, red, green, blue);
   // fill in the path
   cairo_fill(cr);
+}
+
+void translate_coord(cairo_t* cr, int point[2]) {
+  cairo_surface_t* surface = cairo_get_target(cr);
+  int width = cairo_image_surface_get_width(surface);
+  int height = cairo_image_surface_get_height(surface);
+
+  point[0] = width/2 + point[0];
+  point[1] = height/2 - point[1];
 }
